@@ -87,7 +87,9 @@ public class Task implements Runnable {
 						if(rs!=null){
 							rs.close();
 						}
-					}else if (sqlcmd.startsWith("SELECT")) {
+					}else if (sqlcmd.startsWith("SELECT") 
+							// ticket #406 support explain in command editor for postgres
+							|| (ch.getDatabaseProductName() == "PostgreSQL" && sqlcmd.startsWith("EXPLAIN")) ) {
 						// test #329 Query builder / Command editor: avoid PostgreSQL ERROR: current transaction is aborted
 						try {
 							rs = JdbcUtils.executeQuery(ch, syntax, stmt);
