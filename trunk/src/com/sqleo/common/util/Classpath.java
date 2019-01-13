@@ -38,29 +38,36 @@ public class Classpath
 		String bootPath	= System.getProperty("sun.boot.class.path");
 		String classPath= System.getProperty("java.class.path");
 		String extDir	= System.getProperty("java.ext.dirs");
+		StringTokenizer tokenizer = null;
 		
-		StringTokenizer tokenizer = new StringTokenizer(bootPath,";");
-		while(tokenizer.hasMoreTokens())
-		{
-			String filename = tokenizer.nextToken();
-			if(filename.endsWith(".zip") || filename.endsWith(".jar"))
-				startup.addElement(filename);
+		if(bootPath!=null) {
+			tokenizer = new StringTokenizer(bootPath,";");
+			while(tokenizer.hasMoreTokens())
+			{
+				String filename = tokenizer.nextToken();
+				if(filename.endsWith(".zip") || filename.endsWith(".jar"))
+					startup.addElement(filename);
+			}
 		}
 		
-		tokenizer = new StringTokenizer(classPath,";");
-		while(tokenizer.hasMoreTokens())
-		{
-			String filename = tokenizer.nextToken();
-			if(filename.endsWith(".zip") || filename.endsWith(".jar"))
-				startup.addElement(filename);
+		if(classPath!=null) {
+			tokenizer = new StringTokenizer(classPath,";");
+			while(tokenizer.hasMoreTokens())
+			{
+				String filename = tokenizer.nextToken();
+				if(filename.endsWith(".zip") || filename.endsWith(".jar"))
+					startup.addElement(filename);
+			}
 		}
 
-		File fileExtDir = new File(extDir);
-		String[] exts = fileExtDir.list();
-		for(int i=0; exts!=null && i<exts.length; i++)
-		{
-			if(exts[i].endsWith(".zip") || exts[i].endsWith(".jar"))
-				startup.addElement(new File(fileExtDir,exts[i]).toString());
+		if(extDir!=null) {
+			File fileExtDir = new File(extDir);
+			String[] exts = fileExtDir.list();
+			for(int i=0; exts!=null && i<exts.length; i++)
+			{
+				if(exts[i].endsWith(".zip") || exts[i].endsWith(".jar"))
+					startup.addElement(new File(fileExtDir,exts[i]).toString());
+			}
 		}
 	}
 	
