@@ -12,6 +12,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.undo.CannotRedoException;
@@ -101,17 +102,18 @@ public class CompoundUndoManager extends UndoManager
 
 		//  Check for an attribute change
 
-		AbstractDocument.DefaultDocumentEvent event =
-			(AbstractDocument.DefaultDocumentEvent)e.getEdit();
-
-		if  (event.getType().equals(DocumentEvent.EventType.CHANGE))
-		{
-			if (offsetChange == 0)
+		if (e.getEdit() instanceof DefaultDocumentEvent) {
+			AbstractDocument.DefaultDocumentEvent event =
+				(AbstractDocument.DefaultDocumentEvent)e.getEdit();
+	
+			if  (event.getType().equals(DocumentEvent.EventType.CHANGE))
 			{
-				compoundEdit.addEdit(e.getEdit() );
-				return;
+				if (offsetChange == 0)
+				{
+					compoundEdit.addEdit(e.getEdit() );
+					return;
+				}
 			}
-		}
 
 		//  Check for an incremental edit or backspace.
 		//  The Change in Caret position and Document length should both be
@@ -120,19 +122,20 @@ public class CompoundUndoManager extends UndoManager
 //		int offsetChange = textComponent.getCaretPosition() - lastOffset;
 //		int lengthChange = textComponent.getDocument().getLength() - lastLength;
 
-		if (offsetChange == lengthChange
-		&&  Math.abs(offsetChange) == 1)
-		{
-			compoundEdit.addEdit( e.getEdit() );
-			lastOffset = textComponent.getCaretPosition();
-			lastLength = textComponent.getDocument().getLength();
-			return;
+			if (offsetChange == lengthChange
+			&&  Math.abs(offsetChange) == 1)
+			{
+				compoundEdit.addEdit( e.getEdit() );
+				lastOffset = textComponent.getCaretPosition();
+				lastLength = textComponent.getDocument().getLength();
+				return;
+			}
+	
+			//  Not incremental edit, end previous edit and start a new one
+	
+			compoundEdit.end();
+			compoundEdit = startCompoundEdit( e.getEdit() );
 		}
-
-		//  Not incremental edit, end previous edit and start a new one
-
-		compoundEdit.end();
-		compoundEdit = startCompoundEdit( e.getEdit() );
 	}
 
 	/*
