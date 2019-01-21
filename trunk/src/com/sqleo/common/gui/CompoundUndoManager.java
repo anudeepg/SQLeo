@@ -22,14 +22,14 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 /**
-*  This class will merge individual edits into a single larger edit.
-*  That is, characters entered sequentially will be grouped together and
-*  undone as a group. Any attribute changes will be considered as part
-*  of the group and will therefore be undone when the group is undone.
-*  Courtesy to http://tips4java.wordpress.com/2008/10/27/compound-undo-manager/
-*/
+ *  This class will merge individual edits into a single larger edit.
+ *  That is, characters entered sequentially will be grouped together and
+ *  undone as a group. Any attribute changes will be considered as part
+ *  of the group and will therefore be undone when the group is undone.
+ *  Courtesy to http://tips4java.wordpress.com/2008/10/27/compound-undo-manager/
+ */
 public class CompoundUndoManager extends UndoManager
-	implements UndoableEditListener, DocumentListener
+implements UndoableEditListener, DocumentListener
 {
 	private UndoManager undoManager;
 	private CompoundEdit compoundEdit;
@@ -56,15 +56,15 @@ public class CompoundUndoManager extends UndoManager
 		this.textComponent.getInputMap().put(KeyStroke.getKeyStroke("control Y"), "Redo");	
 		registerListener(this.textComponent.getDocument());
 	}
-	
+
 	public void registerListener(Document document){
 		document.addUndoableEditListener( this );
 	}
 
 	/*
-	**  Add a DocumentLister before the undo is done so we can position
-	**  the Caret correctly as each edit is undone.
-	*/
+	 **  Add a DocumentLister before the undo is done so we can position
+	 **  the Caret correctly as each edit is undone.
+	 */
 	public void undo()
 	{
 		textComponent.getDocument().addDocumentListener( this );
@@ -73,9 +73,9 @@ public class CompoundUndoManager extends UndoManager
 	}
 
 	/*
-	**  Add a DocumentLister before the redo is done so we can position
-	**  the Caret correctly as each edit is redone.
-	*/
+	 **  Add a DocumentLister before the redo is done so we can position
+	 **  the Caret correctly as each edit is redone.
+	 */
 	public void redo()
 	{
 		textComponent.getDocument().addDocumentListener( this );
@@ -84,9 +84,9 @@ public class CompoundUndoManager extends UndoManager
 	}
 
 	/*
-	**  Whenever an UndoableEdit happens the edit will either be absorbed
-	**  by the current compound edit or a new compound edit will be started
-	*/
+	 **  Whenever an UndoableEdit happens the edit will either be absorbed
+	 **  by the current compound edit or a new compound edit will be started
+	 */
 	public void undoableEditHappened(UndoableEditEvent e)
 	{
 		//  Start a new compound edit
@@ -101,47 +101,45 @@ public class CompoundUndoManager extends UndoManager
 		int lengthChange = textComponent.getDocument().getLength() - lastLength;
 
 		//  Check for an attribute change
-
+		final boolean isChangeEvent;
 		if (e.getEdit() instanceof DefaultDocumentEvent) {
-			AbstractDocument.DefaultDocumentEvent event =
-				(AbstractDocument.DefaultDocumentEvent)e.getEdit();
-	
-			if  (event.getType().equals(DocumentEvent.EventType.CHANGE))
+			final AbstractDocument.DefaultDocumentEvent event =
+					(AbstractDocument.DefaultDocumentEvent)e.getEdit();
+			isChangeEvent = event.getType().equals(DocumentEvent.EventType.CHANGE);
+		}else {
+			//>java 8
+			isChangeEvent = e.getEdit().isSignificant();
+		}
+		if  (isChangeEvent)
+		{
+			if (offsetChange == 0)
 			{
-				if (offsetChange == 0)
-				{
-					compoundEdit.addEdit(e.getEdit() );
-					return;
-				}
+				compoundEdit.addEdit(e.getEdit() );
+				return;
 			}
-
+		}
 		//  Check for an incremental edit or backspace.
 		//  The Change in Caret position and Document length should both be
 		//  either 1 or -1.
-
-//		int offsetChange = textComponent.getCaretPosition() - lastOffset;
-//		int lengthChange = textComponent.getDocument().getLength() - lastLength;
-
-			if (offsetChange == lengthChange
-			&&  Math.abs(offsetChange) == 1)
-			{
-				compoundEdit.addEdit( e.getEdit() );
-				lastOffset = textComponent.getCaretPosition();
-				lastLength = textComponent.getDocument().getLength();
-				return;
-			}
-	
-			//  Not incremental edit, end previous edit and start a new one
-	
-			compoundEdit.end();
-			compoundEdit = startCompoundEdit( e.getEdit() );
+		//		int offsetChange = textComponent.getCaretPosition() - lastOffset;
+		//		int lengthChange = textComponent.getDocument().getLength() - lastLength;
+		if (offsetChange == lengthChange &&  Math.abs(offsetChange) == 1)
+		{
+			compoundEdit.addEdit( e.getEdit() );
+			lastOffset = textComponent.getCaretPosition();
+			lastLength = textComponent.getDocument().getLength();
+			return;
 		}
+
+		//  Not incremental edit, end previous edit and start a new one
+		compoundEdit.end();
+		compoundEdit = startCompoundEdit( e.getEdit() );
 	}
 
 	/*
-	**  Each CompoundEdit will store a group of related incremental edits
-	**  (ie. each character typed or backspaced is an incremental edit)
-	*/
+	 **  Each CompoundEdit will store a group of related incremental edits
+	 **  (ie. each character typed or backspaced is an incremental edit)
+	 */
 	private CompoundEdit startCompoundEdit(UndoableEdit anEdit)
 	{
 		//  Track Caret and Document information of this compound edit
@@ -182,9 +180,9 @@ public class CompoundUndoManager extends UndoManager
 	{
 		return redoAction;
 	}
-//
-//  Implement DocumentListener
-//
+	//
+	//  Implement DocumentListener
+	//
 	/*
 	 *  Updates to the Document as a result of Undo/Redo will cause the
 	 *  Caret to be repositioned

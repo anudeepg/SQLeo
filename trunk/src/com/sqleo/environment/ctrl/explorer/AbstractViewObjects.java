@@ -189,6 +189,7 @@ public abstract class AbstractViewObjects extends ListView implements MouseListe
 		if(SwingUtilities.isRightMouseButton(me))
 		{
 			int row = getJavaComponent().rowAtPoint(me.getPoint());
+			if (getRowCount() <= row) row = -1;
 			getJavaComponent().setRowSelectionInterval(row,row);
 			
 			JPopupMenu popup = new JPopupMenu();
