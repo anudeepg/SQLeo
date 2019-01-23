@@ -33,6 +33,14 @@ command is in your path.  If it isn't, then you should either
 specify the complete path to the java command or update your
 PATH environment variable.
 
+SQLeoVQB.2019.01.rc1.zip: 2019-01-23
+
+  For changes included see tickets at  
+     http://sourceforge.net/p/sqleo/tickets/milestone/2017.09/
+
+	#407 support for java 9,10 and 11 
+
+
 SQLeoVQB.2017.09.rc1.zip: 2017-09-17
 
   For changes included see tickets at  
